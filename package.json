@@ -1,0 +1,20 @@
+{
+  "name": "wuye-blog",
+  "version": "1.0.0",
+  "description": "潭州 项目实战 -- 个人简易博客",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luoyongfu/wuye-blog.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/luoyongfu/wuye-blog/issues"
+  },
+  "homepage": "https://github.com/luoyongfu/wuye-blog#readme"
+}
