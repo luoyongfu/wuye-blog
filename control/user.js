@@ -2,6 +2,7 @@ const { db } = require('../Schema/config')
 const UserSchema = require('../Schema/user')
 const encrypt = require('../util/encrypt')
 
+
 //通过db对象 创建操作user 数据库的模型对象
 const User = db.model('users', UserSchema)
 
@@ -87,6 +88,33 @@ exports.login = async (ctx) => {
         status: '密码错误 登录失败'
       })
     }
+
+    //让用户在他的 cookie 里设置 username password 加密后的密码 权限
+    ctx.cookies.set('username', username, {
+      domain: 'localhost', //该cookie作用于这个主机名
+      path: '/',
+      maxAge: 36e5,
+      httpOnly: true, //true 不让客户端访问 cookie
+      overwrite: false, // 是否覆盖 
+      signed: false //是否签名 如果不写默认 true 前端可见
+    })
+
+    //用户在数据库的_id值
+    ctx.cookies.set('uid', data[0]._id, {
+      domain: 'localhost', //该cookie作用于这个主机名
+      path: '/',
+      maxAge: 36e5,
+      httpOnly: true, //true 不让客户端访问 cookie
+      overwrite: false, // 是否覆盖 
+      signed: false //是否签名
+    })
+
+    // ctx.session = null 直接过期
+    // ctx.session = {
+    //   username,
+    //   uid: data[0]._id
+    // }
+
     //登录成功
     await ctx.render('isOk', {
       status: '登录成功'
@@ -97,4 +125,37 @@ exports.login = async (ctx) => {
       status: '登录失败'
     })
   })
+}
+
+//确定用户的状态 保持用户状态
+exports.keepLog = async(ctx, next) => {
+  if(ctx.session.isNew){
+    //session 没有
+    if(ctx.cookies.get('username')){
+      ctx.session = {
+        username: ctx.cookies.get('username'),
+        uid: ctx.cookies.get('uid')
+      }
+    }
+  }
+  await next()
+  // ctx.body = 'dowm'
+}
+
+
+//用户退出中间件
+exports.logout = async ctx => {
+  ctx.session = null
+
+  ctx.cookies.set('username', null, {
+    maxAge: 0
+  })//直接设置过期
+
+  ctx.cookies.set('uid', null, {
+    maxAge: 0
+  })//直接设置过期
+
+  //退出后在后台进行重定向到首页
+  ctx.redirect('/')//重定向方法
+  //前端重定向 location.href = '/'
 }
