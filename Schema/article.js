@@ -1,10 +1,13 @@
 const { Schema } = require('./config')
-
+const ObjectId = Schema.Types.ObjectId
 
 const ArticleSchema = new Schema({
   title: String,
   content: String,
-  author: String,
+  author: {
+    type: ObjectId,//类型是ObjectId
+    ref: 'users'//用于 关联users集合
+  },//关联users的表 取得对应的user的一些数据
   tips: String
 },{
   versionKey: false,

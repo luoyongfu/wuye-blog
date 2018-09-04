@@ -110,10 +110,11 @@ exports.login = async (ctx) => {
     })
 
     // ctx.session = null 直接过期
-    // ctx.session = {
-    //   username,
-    //   uid: data[0]._id
-    // }
+    ctx.session = {
+      username,
+      uid: data[0]._id,
+      avatar: data[0].avatar
+    }
 
     //登录成功
     await ctx.render('isOk', {
