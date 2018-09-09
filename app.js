@@ -46,3 +46,39 @@ app
   .listen(3000, () => {
     console.log("项目启动成功 监听在3000端口")
   })
+
+//创建管理员用户 如果管理员用户已存在 则返回
+{
+  //admin admin
+  const { db } = require('./Schema/config')
+  const UserSchema = require('./Schema/user')
+  const encrypt = require('./util/encrypt.js')
+
+  //通过db对象 创建操作user 数据库的模型对象
+  const User = db.model('users', UserSchema)
+
+  User
+    .find({username: 'admin'})
+    .then(data => {
+      if(data.length === 0){
+        //管理员不存在 创建
+        new User({
+          username: 'admin',
+          password: encrypt('admin'),
+          role: 666,
+          commentNum: 0,
+          articleNum: 0
+        })
+        .save()
+        .then(data => {
+          console.log('管理员用户名： admin 密码 -> admin')
+        })
+        .catch(err => {
+          console.log('管理员账号检查失败')
+        })
+      }else{
+        //在控制台输出
+        console.log('管理员用户名： admin 密码 -> admin')
+      }
+    })
+}

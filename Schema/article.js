@@ -8,7 +8,8 @@ const ArticleSchema = new Schema({
     type: ObjectId,//类型是ObjectId
     ref: 'users'//用于 关联users集合
   },//关联users的表 取得对应的user的一些数据
-  tips: String
+  tips: String,
+  commentNum: Number
 },{
   versionKey: false,
   timestamps: {

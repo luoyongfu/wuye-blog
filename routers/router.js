@@ -2,6 +2,8 @@ const Router = require('koa-router')
 //拿到操作user 表的逻辑对象
 const user = require('../control/user')
 const article = require('../control/article')
+const comment = require('../control/comment')
+const admin = require('../control/admin')
 
 const router = new Router
 
@@ -35,5 +37,22 @@ router.post('/article', user.keepLog, article.add)
 //文章列表分页 路由
 //  /page/1234567 page后面是页数
 router.get('/page/:id', article.getList)
+
+// 文章详情页
+router.get('/article/:id', user.keepLog, article.details)
+
+// 发表评论 
+router.post('/comment', user.keepLog, comment.save)
+
+// 后台个人中心  文章评论 头像上传
+router.get('/admin/:id', user.keepLog, admin.index)
+
+
+//任意路由 未能匹配成果 返回404页面
+router.get('*', async ctx => {
+    await ctx.render("404",{
+        title: '404'
+    })
+})
 
 module.exports = router
