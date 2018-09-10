@@ -1,10 +1,11 @@
-const { db } = require('../Schema/config')
-const UserSchema = require('../Schema/user')
+const Article = require('../Models/article')
+const User = require('../Models/user')
+const Comment = require('../Models/comment')
 const encrypt = require('../util/encrypt')
 
 
 //通过db对象 创建操作user 数据库的模型对象
-const User = db.model('users', UserSchema)
+// const User = db.model('users', UserSchema) 
 
 // 用户注册
 exports.reg = async (ctx) => {
@@ -136,9 +137,14 @@ exports.keepLog = async(ctx, next) => {
   if(ctx.session.isNew){
     //session 没有
     if(ctx.cookies.get('username')){
+      let uid = ctx.cookies.get('uid')
+      const avatar = await User.findById(uid)
+        .then(data => data.avatar)
+
       ctx.session = {
         username: ctx.cookies.get('username'),
-        uid: ctx.cookies.get('uid')
+        uid,
+        avatar
       }
     }
   }
@@ -162,4 +168,29 @@ exports.logout = async ctx => {
   //退出后在后台进行重定向到首页
   ctx.redirect('/')//重定向方法
   //前端重定向 location.href = '/'
+}
+
+//用户头像上传
+exports.upload = async ctx => {
+  //取得文件名
+  const filename = ctx.req.file.filename
+
+  let data = {}
+
+  await User.update({_id: ctx.session.uid}, {$set: {avatar: '/avatar/' + filename}}, (err, res) =>{
+    if(err){
+      data = {
+        status: 0,
+        message: "上传失败"
+      }
+    }else{
+      data = {
+        status: 1,
+        message: '上传成功'
+      }
+    }
+  })
+
+  
+  ctx.body = data
 }

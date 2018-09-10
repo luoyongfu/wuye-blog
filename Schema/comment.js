@@ -22,4 +22,26 @@ const CommentSchema = new Schema({
 })
 //versionKey 显示版本号
 //timestamps 显示创建时间 和 更新时间
+
+// 设置comment 的 remove钩子
+// 前置钩子
+// CommentSchema.pre('remove', (next) => {
+//   // this 指向当前文档
+// })
+
+// 后置钩子 在所有钩子最后 同样处于事件之前
+CommentSchema.post('remove', (doc) => {
+  //当前这个回调函数 一定会在remove之前触发
+  const Article = require('../Models/article.js')
+  const User = require('../Models/user.js')
+
+  const { from, article } = doc
+  // 对应 文章评论数 -1
+  Article.updateOne({_id: article}, {$inc: {commentNum: -1}}).exec()
+
+  // 当前被删除的评论作者 commentNum -1
+  User.updateOne({_id: from}, {$inc: {commentNum: -1}}).exec()
+
+})
+
 module.exports = CommentSchema

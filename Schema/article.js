@@ -18,4 +18,21 @@ const ArticleSchema = new Schema({
 })
 //versionKey 显示版本号
 //timestamps 显示创建时间 和 更新时间
+ArticleSchema.post('remove', doc => {
+
+  const Comment = require('../Models/comment.js')
+  const User = require('../Models/user.js')
+
+  const { _id:artId, author: authorId } = doc
+  // 只需要用户的 articleNum -1
+  User.findByIdAndUpdate(authorId, {$inc: {articleNum: - 1}}).exec()
+
+
+  // 把当前删除的文章 对应的所有评论 依次调用评论remove
+  Comment.find({article: artId})
+    .then(data => {
+      data.forEach(v => v.remove())
+    }) 
+})
+
 module.exports = ArticleSchema 

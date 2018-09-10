@@ -1,14 +1,6 @@
-const { db } = require('../Schema/config')
-const ArticleSchema = require('../Schema/article')
-//取得 user的 Schema 为了拿到操作 users集合的对象
-const UserSchema = require('../Schema/user')
-const User = db.model('users', UserSchema)
-
-//通过db对象 创建操作Article 数据库的模型对象
-const Article = db.model('articles', ArticleSchema)
-//控制评论
-const CommentSchema = require('../Schema/Comment.js')
-const Comment = db.model('comments', CommentSchema)
+const Article = require('../Models/article')
+const User = require('../Models/user')
+const Comment = require('../Models/comment')
 
 //返回文章发表页
 exports.addPage = async ctx => {
@@ -122,3 +114,95 @@ exports.details = async ctx => {
     session: ctx.session
   })
 }
+
+// 获取对应用户文章
+exports.artlist = async ctx => {
+  const uid = ctx.session.uid
+
+  const data = await Article.find({author: uid})
+
+  ctx.body = {
+    code: 0,
+    count: data.length,
+    data
+  }
+}
+
+//删除对应ID 文章
+exports.del = async ctx => {
+  const _id = ctx.params.id
+
+  let res = {
+    state: 1,
+    message: '成功'
+  }
+
+  await Article.findById(_id)
+    .then(data => data.remove())
+    .catch(err => {
+      res = {
+        state: 0,
+        message: err
+      }
+    })
+    
+  ctx.body = res
+}
+
+//删除对应ID 文章
+// exports.del = async ctx => {
+//   //获取文章 ID
+//   const _id = ctx.params.id
+//   // 获取用户ID
+//   let uid;
+
+
+//   //用户的articleNum -= 1
+//   //删除文章对应所有评论
+//   // 被删除评论对应用户表里的 commentNum -=1
+
+//   let res = {}
+
+//   //删除文章
+//   await Article.deleteOne({_id}).exec(async err => {
+//     if(err){
+//       res = {
+//         state: 0,
+//         message: '删除失败'
+//       }
+//     }else{
+//       await Article.findById(_id).then(data => {
+//         uid = data.author
+//       })
+//     }
+//   })
+
+//   await User.update({uid}, {$inc: {articleNum: -1}})
+  
+//   //删除评论
+//   await Comment.find({article: _id}).then(async data => {
+//     //data 是 array
+//     let len = data.length;
+//     let i = 0;
+
+
+//     async function deleteUser(){
+//       if(i >= len)return
+//       const cid = data[i]._id
+
+//       await Comment.deleteOne({_id: cid}).then(data => {
+//         User.update({_id: data[i].from}, {$inc: {commentNum: -1}}, err => {
+//           if(err)return console.log(err)
+//           i++
+//         })
+//       })
+//     } 
+
+//     await deleteUser()
+    
+//   })
+
+//   ctx.body = res
+
+
+// }

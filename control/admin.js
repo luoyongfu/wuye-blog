@@ -1,16 +1,19 @@
-const { db } = require('../Schema/config')
+// const { db } = require('../Schema/config')
 
 
-const ArticleSchema = require('../Schema/article')
-//通过db对象 创建操作Article 数据库的模型对象
-const Article = db.model('articles', ArticleSchema)
-//取得 user的 Schema 为了拿到操作 users集合的对象
-const UserSchema = require('../Schema/user')
-const User = db.model('users', UserSchema)
+// const ArticleSchema = require('../Schema/article')
+// //通过db对象 创建操作Article 数据库的模型对象
+// const Article = db.model('articles', ArticleSchema)
+// //取得 user的 Schema 为了拿到操作 users集合的对象
+// const UserSchema = require('../Schema/user')
+// const User = db.model('users', UserSchema)
 
-//控制评论
-const CommentSchema = require('../Schema/Comment.js')
-const Comment = db.model('comments', CommentSchema)
+// //控制评论
+// const CommentSchema = require('../Schema/Comment.js')
+// const Comment = db.model('comments', CommentSchema)
+const Article = require('../Models/article')
+const User = require('../Models/user')
+const Comment = require('../Models/comment')
 
 const fs = require('fs')
 const { join } = require('path')
